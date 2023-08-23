@@ -3,7 +3,9 @@ import numpy as np
 def getTopographyData (rgb_data, minDepth, maxDepth):
 
     indexColors = IndexUniqueColors(rgb_data)
-    depthVector = np.linspace(maxDepth, minDepth, 400)
+
+    length_color_vec = len(rgb_data)
+    depthVector = np.linspace(maxDepth, minDepth, length_color_vec)
 
     cols = 4
     rows = len(indexColors)
