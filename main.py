@@ -1,16 +1,20 @@
 from PIL import Image
 import img_processing
+import colors_processing
 import numpy as np
 import cv2 as cv
 
 # PARAMETERS
     # DATAFILE - File name of topography image to process
     # XY_RESOLUTION - Samples the image for every nth data point when creating 3d image
-    # DEPTHS - Array of numbers corresponding to depths in the image (needed due to limitations in the OCR)
+    # DEPTH_LOW - Lowest depth in the image (either left or bottom)
+    # DEPTH_HIGH - Highest depth in the image (either right or top)
 
-DATAFILE = 'topo2.png'
+DATAFILE = 'topo0.png'
 XY_RESOLUTION = 3
 DEPTHS = [200, 100, 0, -100, -200, -300] # List top to bottom or left to right
+DEPTH_HIGH = 2500
+DEPTH_LOW = -5500
 DEPTH_RESOLUTION = 20 # If 2 entries are given for depth (Low depth and high depth), sample based on this value
 
 
@@ -50,14 +54,15 @@ for entry in contour_data:
 cv.imwrite ("Contour_output.png", im)
 
 
-
-
 im = Image.open(DATAFILE, 'r')
 rgb_im = im.convert('RGB')
 RGB_pixels = rgb_im.load()
 
-img_processing.colorToDepth(DATAFILE, RGB_pixels, contour_data, DEPTH_RESOLUTION, XY_RESOLUTION, DEPTHS)
+rgb_data = img_processing.colorToDepth(DATAFILE, RGB_pixels, contour_data, DEPTH_RESOLUTION, XY_RESOLUTION, DEPTHS)
+topologyData = colors_processing.getTopographyData(rgb_data, DEPTH_LOW, DEPTH_HIGH)
 
+
+print(f"\n {topologyData}")
 
 # Obtaining color-depth array
 

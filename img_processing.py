@@ -75,20 +75,21 @@ def colorToDepth (DATAFILE, RGB_pixels, contour_data, depthRes, xyRes, depth):
         color_To_Depth_Data = ColorArray(depth)
 
         if w > h: # iterate by changing x
-            sample_cords = np.linspace(x+5, x+w-5, 100).astype(int)
+            sample_cords = np.linspace(x+5, x+w-5, 400).astype(int)
 
             color_To_Depth_Data = sample_right(color_To_Depth_Data, RGB_pixels, depth, sample_cords, int(y+h/2))
         
         else: # iterate by changing y
-            sample_cords = np.linspace(y+5, y+h-5, 100).astype(int)
+            sample_cords = np.linspace(y+5, y+h-5, 400).astype(int)
 
             color_To_Depth_Data = sample_down(color_To_Depth_Data, RGB_pixels, depth, sample_cords, int(x+w/2))
 
-            # print (color_To_Depth_Data)
     # If the color bars are instead multiple discrete rectangles
     else:
         for entry in contour_data:
             pass
+
+    return color_To_Depth_Data
 
 
 def sample_down (data, RGB_pixels, depth, sample_cords, midSection):
@@ -100,8 +101,8 @@ def sample_down (data, RGB_pixels, depth, sample_cords, midSection):
         data [index][2] = b
 
         index = index + 1
+    # TODO: Calculate number of unique colors and their relative indexes > map to depths
 
-    print (data)
     return data
 
 def ColorArray(depth):
@@ -112,7 +113,7 @@ def ColorArray(depth):
         rows = len(depth)
     
 
-    rows = 100 # remove later
+    rows = 400 # remove later
 
     color_To_Depth_Data = [[0]*cols for _ in range(rows)]
 

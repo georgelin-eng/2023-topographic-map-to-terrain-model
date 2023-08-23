@@ -1,6 +1,6 @@
 # NOTES:
-    # OCR on this image will not work very well even with cropping
-    # TODO: Ask user for array of numbers corresponding to depths
+    # OCR on this image does not work very well even with cropping
+    # TODO: Ask user for array of numbers corresponding to depths instead
 
 import pytesseract
 import cv2
