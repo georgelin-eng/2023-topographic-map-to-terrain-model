@@ -5,7 +5,12 @@ def getTopographyData (rgb_data, minDepth, maxDepth):
     indexColors = IndexUniqueColors(rgb_data)
 
     length_color_vec = len(rgb_data)
-    depthVector = np.linspace(maxDepth, minDepth, length_color_vec)
+
+    # change the depth vector depending on if it goes max > min or min > max
+    if maxDepth < minDepth:
+        depthVector = np.linspace(minDepth, maxDepth, length_color_vec)
+    else:
+        depthVector = np.linspace(maxDepth, minDepth, length_color_vec)
 
     cols = 4
     rows = len(indexColors)
@@ -38,7 +43,7 @@ def IndexUniqueColors (rgb_data):
             r1, r2, g1, g2, b1, b2 = getColors(rgb_data, index)
             RGB_diff = RGB_diff+rgbDifference(r1, r2, g1, g2, b1, b2)
 
-            if RGB_diff > 20: # 20 is the threshold value
+            if RGB_diff > 25: # 20 is the threshold value
                 # print (f"difference = {RGB_diff}, RGB = {r1,g1,b1}, index = {index}")
                 indexColors.append(index)
                 RGB_diff = 0
@@ -59,5 +64,41 @@ def getColors (rgb_data, index):
     return r1, r2, g1, g2, b1, b2
 
 def rgbDifference(r1, r2, g1, g2, b1, b2):
-    
     return abs(r2-r1) + abs(g2-g1) + abs(b2-b1)
+
+def removeBadColors (input_list):
+    filtered_list = []
+
+    for entry in input_list:
+        i = 0
+        # delete bright entries
+        if (entry[0] + entry[1] + entry[2] > 250*3):
+            i = 1
+
+        # delete dark entries
+        if (entry[0] + entry[1] + entry [2] < 75 and max(entry[0], entry[1], entry[2]) < 50):
+            i = 1
+
+        # delete gray entries
+        if (max(entry[0], entry[1], entry[2]) - min(entry[0], entry[1], entry[2]) < 2):
+            i = 1
+
+        if i == 0:
+            filtered_list.append(entry)
+
+    return filtered_list
+
+
+def removeEntries (input_list, final_length):
+    if final_length >= len(input_list):
+        return input_list
+
+    step_size = len(input_list) / final_length
+    output_list = []
+
+    for i in range(len(input_list)):
+        if i % step_size < 1:
+            output_list.append(input_list[i])
+    
+    return output_list
+

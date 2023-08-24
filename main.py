@@ -1,19 +1,20 @@
 from PIL import Image
 import img_processing
 import colors_processing
+import plot
 import numpy as np
 import cv2 as cv
 
 # PARAMETERS
     # DATAFILE - File name of topography image to process
     # XY_RESOLUTION - Samples the image for every nth data point when creating 3d image
-    # DEPTH_LOW - Lowest depth in the image (either left or bottom)
-    # DEPTH_HIGH - Highest depth in the image (either right or top)
+    # DEPTH_HIGH - Depth listed at right or top
+    # DEPTH_LOW - Depth at left or bottom
 
-DATAFILE = 'topo3.png'
+DATAFILE = 'topo3_rotated.png'
 XY_RESOLUTION = 3
-DEPTH_HIGH = -250
-DEPTH_LOW = 500
+DEPTH_HIGH = 500
+DEPTH_LOW = 300
 DEPTH_RESOLUTION = 20 # If 2 entries are given for depth (Low depth and high depth), sample based on this value
 
 
@@ -52,16 +53,23 @@ cv.imwrite ("Contour_output.png", im)
 
 im = Image.open(DATAFILE, 'r')
 rgb_im = im.convert('RGB')
-RGB_pixels = rgb_im.load()
+pixel_map = rgb_im.load()
 
 # Getting every rgb color via sampling the colorbar
-rgb_data = img_processing.colorToDepth(RGB_pixels, contour_data)
+rgb_data = img_processing.getBarRGB(pixel_map, contour_data)
 
 # Obtaining new array of unique colors and asigning a depth to each color
 topologyData = colors_processing.getTopographyData(rgb_data, DEPTH_LOW, DEPTH_HIGH)
+topologyData = colors_processing.removeBadColors(topologyData)
+topologyData = colors_processing.removeEntries(topologyData, DEPTH_RESOLUTION)
 
 # Sampling image to obtain data in form: x, y, h
 
+# print (len(topologyData))
+ 
+
+rgb_data = plot.extract_RGB(topologyData)
+plot.create_color_bar(rgb_data)
 
 print(f"\n {topologyData}")
 

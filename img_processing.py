@@ -69,7 +69,7 @@ def get_contour_data (contours):
 
     return contour_data
 
-def colorToDepth (RGB_pixels, contour_data):
+def getBarRGB (pixel_map, contour_data):
 
     # If the color bar is a single solid rectangle
     if len(contour_data) == 1: 
@@ -80,13 +80,13 @@ def colorToDepth (RGB_pixels, contour_data):
         x, y, w, h = rectDims(entry)
         color_To_Depth_Data = ColorArray(num_color_samples)
 
-        if w > h: # iterate by changing x
+        if w > h: # horizontal bar - iterate by changing x
             sample_cords = np.linspace(x+5, x+w-5, num_color_samples).astype(int)
-            color_To_Depth_Data = sample_right(color_To_Depth_Data, RGB_pixels, sample_cords, int(y+h/2))
+            color_To_Depth_Data = sample_right(color_To_Depth_Data, pixel_map, sample_cords, int(y+h/2))
         
-        else: # iterate by changing y
+        else: # vertical bar - iterate by changing y
             sample_cords = np.linspace(y+5, y+h-5, num_color_samples).astype(int)
-            color_To_Depth_Data = sample_down(color_To_Depth_Data, RGB_pixels, sample_cords, int(x+w/2))
+            color_To_Depth_Data = sample_down(color_To_Depth_Data, pixel_map, sample_cords, int(x+w/2))
 
     # If the color bars are instead multiple discrete rectangles
     # 1. get the coordinates of each rectangle
@@ -95,24 +95,28 @@ def colorToDepth (RGB_pixels, contour_data):
     else:
         x1, y1, _, _ = rectDims(contour_data[0])
         x2, y2, _, _ = rectDims(contour_data[1])
+        
+        contour_data = np.flip(contour_data)
         sample_cords = create_coordinate_array(contour_data, x2, x1)
         
+
         for entry in contour_data:
             x, y, w, h = rectDims(entry)
             
-            if x2-x1 > 5: #iterate by changing x
-                color_To_Depth_Data = ColorArray (len(sample_cords)) # make the same length as the coordinate array
-                color_To_Depth_Data = sample_right(color_To_Depth_Data, RGB_pixels, sample_cords, int(y+h/2))
+        if x2-x1 > 5: #iterate by changing x
+            color_To_Depth_Data = ColorArray (len(sample_cords)) # make the same length as the coordinate array
+            color_To_Depth_Data = sample_right(color_To_Depth_Data, pixel_map, sample_cords, int(y+h/2))
 
-            else: #iterate by changing y
-                color_To_Depth_Data = ColorArray (len(sample_cords)) # make the same length as the coordinate array
-                color_To_Depth_Data = sample_right(color_To_Depth_Data, RGB_pixels, sample_cords, int(y+h/2))
+        else: #iterate by changing y
+            color_To_Depth_Data = ColorArray (len(sample_cords)) # make the same length as the coordinate array
+            color_To_Depth_Data = sample_down(color_To_Depth_Data, pixel_map, sample_cords, int(x+w/2))
 
     return color_To_Depth_Data
 
 
 def sample_down (data, RGB_pixels, sample_cords, midSection):
     index = 0
+    
     for cordinate in sample_cords:
         r, g, b = RGB_pixels[midSection,cordinate]
         data [index][0] = r
@@ -125,7 +129,7 @@ def sample_down (data, RGB_pixels, sample_cords, midSection):
 
 def sample_right (data, RGB_pixels, sample_cords, midSection):
     index = 0
-    sample_cords = np.flip(sample_cords) # Reverse the array so that it fits properly
+    # sample_cords = np.flip(sample_cords) # Reverse the array so that it fits properly
     for cordinate in sample_cords:
         r, g, b = RGB_pixels[cordinate,midSection]
         data [index][0] = r
@@ -136,9 +140,11 @@ def sample_right (data, RGB_pixels, sample_cords, midSection):
 
     return data
 
+# Creates an empty array that will store data in the following format
+# [r, g, b, depth] 
 def ColorArray(num_color_samples):
     cols = 4
-    rows = num_color_samples # generic value just for accuracy. Keep same as linespace value
+    rows = num_color_samples # generic value just for accuracy. Match with the length of a vector for depth info
 
     color_To_Depth_Data = [[0]*cols for _ in range(rows)]
 
@@ -168,21 +174,10 @@ def create_coordinate_array (contour_data, x2, x1):
         else:
             num_color_samples = h - 10
             cord_vec = np.linspace(y+5, y+h-5, num_color_samples).astype(int)
+            # cord_vec = np.flip(cord_vec)
+
             coordinate_vector.extend(cord_vec)
 
     coordinate_vector = np.array(coordinate_vector)
 
     return coordinate_vector
-
-def getPixelsImage (RGB_pixels):
-    width = 920
-    height = 860
-
-    output_image = Image.new('RGB', (width, height))
-    
-    for y in range(height):
-        for x in range(width):
-            pixel = RGB_pixels[x,y]
-            output_image.putpixel((x, y), pixel)
-
-    output_image.save('output_image.jpg')
