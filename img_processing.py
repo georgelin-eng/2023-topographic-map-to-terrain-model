@@ -98,16 +98,17 @@ def getBarRGB (pixel_map, contour_data):
         
         contour_data = np.flip(contour_data)
         sample_cords = create_coordinate_array(contour_data, x2, x1)
-        
+        sample_cords = np.flip(sample_cords)        
 
         for entry in contour_data:
             x, y, w, h = rectDims(entry)
             
-        if x2-x1 > 5: #iterate by changing x
+        if abs(x2-x1) > 5: #iterate by changing x
             color_To_Depth_Data = ColorArray (len(sample_cords)) # make the same length as the coordinate array
             color_To_Depth_Data = sample_right(color_To_Depth_Data, pixel_map, sample_cords, int(y+h/2))
 
         else: #iterate by changing y
+            print ("y value = ", y)
             color_To_Depth_Data = ColorArray (len(sample_cords)) # make the same length as the coordinate array
             color_To_Depth_Data = sample_down(color_To_Depth_Data, pixel_map, sample_cords, int(x+w/2))
 
@@ -168,7 +169,7 @@ def create_coordinate_array (contour_data, x2, x1):
         if abs(x2-x1) > 3:
             num_color_samples = w - 10
             cord_vec = np.linspace(x+5,x+w-5, num_color_samples).astype(int)
-            cord_vec = np.flip(cord_vec)
+            # cord_vec = np.flip(cord_vec)
             coordinate_vector.extend(cord_vec)
 
         else:

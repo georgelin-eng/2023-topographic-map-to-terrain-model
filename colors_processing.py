@@ -102,3 +102,20 @@ def removeEntries (input_list, final_length):
     
     return output_list
 
+def removeDramaticChanges(topology_data):
+    filtered_list = []
+    
+    for index in range(len(topology_data) - 1):
+        r1, g1, b1, _ = topology_data[index]
+        r2, g2, b2, _ = topology_data[index + 1]
+
+        if r1-r2 + g2-g1 + b2-b1 > 60:
+            pass
+
+        else:
+            filtered_list.append(topology_data[index])
+
+    return filtered_list
+
+
+
