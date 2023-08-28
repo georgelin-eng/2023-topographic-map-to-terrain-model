@@ -1,10 +1,10 @@
 import numpy as np
 
-def getTopographyData (rgb_data, minDepth, maxDepth):
+def getRGBHeights (rgb_values, minDepth, maxDepth):
 
-    indexColors = IndexUniqueColors(rgb_data)
+    indexColors = IndexUniqueColors(rgb_values)
 
-    length_color_vec = len(rgb_data)
+    length_color_vec = len(rgb_values)
 
     # change the depth vector depending on if it goes max > min or min > max
     if maxDepth < minDepth:
@@ -14,18 +14,18 @@ def getTopographyData (rgb_data, minDepth, maxDepth):
 
     cols = 4
     rows = len(indexColors)
-    topologyData = [[0]*cols for _ in range(rows)]
+    rgb_heights = [[0]*cols for _ in range(rows)]
     
     i = 0
     for num in indexColors:
-        topologyData[i][0] = rgb_data[num+1][0] # r value
-        topologyData[i][1] = rgb_data[num+1][1] # g value
-        topologyData[i][2] = rgb_data[num+1][2] # b value
-        topologyData[i][3] = int(depthVector[num+1]) # b value
+        rgb_heights[i][0] = rgb_values[num+1][0] # r value
+        rgb_heights[i][1] = rgb_values[num+1][1] # g value
+        rgb_heights[i][2] = rgb_values[num+1][2] # b value
+        rgb_heights[i][3] = int(depthVector[num+1]) # b value
 
         i+=1
 
-    return topologyData
+    return rgb_heights
 
 
 # Params:
@@ -76,7 +76,7 @@ def removeBadColors (input_list):
             i = 1
 
         # delete dark entries
-        if (entry[0] + entry[1] + entry [2] < 75 and max(entry[0], entry[1], entry[2]) < 50):
+        if (entry[0] + entry[1] + entry [2] < 50 and max(entry[0], entry[1], entry[2]) < 40):
             i = 1
 
         # delete gray entries

@@ -2,20 +2,14 @@ from PIL import Image
 import numpy as np
 import cv2 as cv
 
-def gray_to_white(pixels, width, height):
+def create_binary_img(pixels, width, height):
     for x in range (width): 
         for y in range (height):
             r, g, b = pixels[x,y]
-            if (max(r,g,b) - min(r,g,b) < 10):
-                pixels[x,y] = (255, 255, 255) # Convert to white
-
-def create_binary_img (pixels, width, height):
-    for x in range(width): 
-        for y in range(height):
-            if pixels[x,y] == (255, 255, 255): # Convert to black
-                pixels[x,y] = (0, 0 ,0)
-            else:                                                                                              
-                pixels[x,y] = (255, 255, 255) # Convert to white
+            if (max(r,g,b) - min(r,g,b) < 10): # Detects grays / whites
+                pixels[x,y] = (0, 0, 0) # Black
+            else:
+                pixels[x,y] = (255, 255, 255) # White
 
 def get_colorbar_index (size):
     sorted_sizes = sorted(size)
@@ -69,7 +63,7 @@ def get_contour_data (contours):
 
     return contour_data
 
-def getBarRGB (pixel_map, contour_data):
+def getRGB_values (pixel_map, contour_data):
 
     # If the color bar is a single solid rectangle
     if len(contour_data) == 1: 
@@ -108,7 +102,6 @@ def getBarRGB (pixel_map, contour_data):
             color_To_Depth_Data = sample_right(color_To_Depth_Data, pixel_map, sample_cords, int(y+h/2))
 
         else: #iterate by changing y
-            print ("y value = ", y)
             color_To_Depth_Data = ColorArray (len(sample_cords)) # make the same length as the coordinate array
             color_To_Depth_Data = sample_down(color_To_Depth_Data, pixel_map, sample_cords, int(x+w/2))
 
@@ -182,3 +175,52 @@ def create_coordinate_array (contour_data, x2, x1):
     coordinate_vector = np.array(coordinate_vector)
 
     return coordinate_vector
+
+# TODO: pass bounding box information about the largest array
+def getTopographyData(width, height, pixels, RGB_heights):
+    cols = 3
+    rows = width*height
+    TopographyData = [[0]*cols for _ in range(rows)]
+    index = 0
+    
+    for x in range (width): 
+        for y in range (height):
+            r_im, g_im, b_im = pixels[x,y]
+            indexClosest = getClosestIndex(r_im, g_im, b_im, RGB_heights)
+
+            if indexClosest is not None:
+                TopographyData[index][0] = x                
+                TopographyData[index][1] = y                
+                TopographyData[index][1] = RGB_heights[indexClosest][3]           
+
+            index +=1
+
+
+    return TopographyData
+
+# This will find the location of the rgb in the RGB_heights array that matches closest to the color of the pixel
+def getClosestIndex (r_im, g_im, b_im, RGB_heights):
+
+    min_diff = 255*3
+    min_index = 0
+    index = 0
+
+    for entry in RGB_heights:
+        diff = RGB_difference(r_im, g_im, b_im, entry)
+        
+        if diff < min_diff:
+            min_diff = diff
+            min_index = index
+        
+        index+=1
+    if (max(r_im, g_im, b_im) - min(r_im, g_im, b_im) < 10):
+        min_index = None
+
+    return min_index
+        
+def RGB_difference (r_im, g_im, b_im, entry):
+    r = entry[0]
+    g = entry[1]
+    b = entry[2]
+
+    return abs (r_im - r) + abs(g_im - g) + abs(b_im - b)
