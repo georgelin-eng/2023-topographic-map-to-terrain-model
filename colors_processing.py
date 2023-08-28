@@ -76,7 +76,7 @@ def removeBadColors (input_list):
             i = 1
 
         # delete dark entries
-        if (entry[0] + entry[1] + entry [2] < 50 and max(entry[0], entry[1], entry[2]) < 40):
+        if (entry[0] + entry[1] + entry [2] < 75 and max(entry[0], entry[1], entry[2]) < 45):
             i = 1
 
         # delete gray entries

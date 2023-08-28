@@ -14,7 +14,7 @@ import cv2 as cv
 
 
 DATAFILE = 'topo0.png'
-XY_RESOLUTION = 3
+XY_RESOLUTION = 1
 MAX_DEPTH = 500
 MIN_DEPTH = -250
 DEPTH_RESOLUTION = 15
@@ -23,6 +23,7 @@ Plotting = 'off'
 
 ##################################################################
 # PREPROCESSING STEP
+# The image is scaled down to a lower resolution via the XY_RESOLUTION parameter 
 # The specific file is loaded as a pixel map and each individual becomes either black or white based on a specified condition
 # This process is iterated for each pixel for O(n^2) performance
 # TODO: Use matrix manipulations to achieve better runtime efficiency
@@ -30,9 +31,16 @@ Plotting = 'off'
 im = Image.open(DATAFILE, 'r')
 width, height = im.size
 
+# if XY_RESOLUTION > 1:
+#     width = int(width/XY_RESOLUTION)
+#     height = int(height/XY_RESOLUTION)
+#     im = im.resize((width, height), Image.NEAREST)
+
+#     im.save('Resized_image.png')
+
 rgb_im = im.convert('RGB')
 pixels = rgb_im.load() # create the pixel map
-# pixel_map = rgb_im.load()
+pixel_map = rgb_im.load()
 
 img_processing.create_binary_img(pixels, width, height) # Create binary image by converting white/grays > black and all others to white
 rgb_im.save('File.png')
@@ -79,18 +87,15 @@ pixel_map = rgb_im.load()
 # Getting every rgb color via sampling the colorbar
 rgb_values = img_processing.getRGB_values(pixel_map, contour_data)
 
-# Obtaining new array of unique colors and asigning a depth to each color
 # Outputs an array in the form [r, g, b, depth]
-
 RGB_heights = colors_processing.getRGBHeights(rgb_values, MIN_DEPTH, MAX_DEPTH)
 
-print("\n Getting topography data... \n")
-TopographyData = img_processing.getTopographyData(width, height, pixel_map, RGB_heights)
+# print("\n Getting topography data... \n")
+# TopographyData = img_processing.getTopographyData(width, height, XY_RESOLUTION, pixel_map, RGB_heights)
 
-np_topography = np.array(TopographyData)
-np.savetxt('data.csv', np_topography, delimiter=',', fmt='%d')
+# np_topography = np.array(TopographyData)
+# np.savetxt('data.csv', np_topography, delimiter=',', fmt='%d')
 
-print(TopographyData)
 ##########################################################################
 
 # Plotting Function Data 
@@ -98,8 +103,8 @@ print(TopographyData)
 ##########################################################################
 
 # Processing topology data
+RGB_heights = colors_processing.removeDramaticChanges(RGB_heights)
 RGB_heights = colors_processing.removeBadColors(RGB_heights)
-# RGB_heights = colors_processing.removeDramaticChanges(RGB_heights)
 RGB_heights = colors_processing.removeEntries(RGB_heights, DEPTH_RESOLUTION)
 
 # Creating Colorbar plot

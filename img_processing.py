@@ -35,7 +35,7 @@ def get_contour_data (contours):
         #   bounding_box_area/area ~ 1 means a perfect rectangle. 1.3 is chosen for some wiggle room
 
         if area > 80:
-            if bounding_box_area/area < 1.3:
+            if bounding_box_area/area < 1.4:
                 # print (f"box area = {w*h}, Countor area = {area}, Index = {index}")
                 size[index] = area
                 contour_data.append({
@@ -54,6 +54,7 @@ def get_contour_data (contours):
     for i in range (len(contour_data)):
         areas[i] = contour_data[i]['area']
 
+    # Delete the largest rectangle if it is 10x larger than the smallest
     if max(areas)/min(areas) > 10:
         max_area_index = np.where(areas == max(areas))[0][0]
         contour_data = np.delete (contour_data, max_area_index)
@@ -177,13 +178,13 @@ def create_coordinate_array (contour_data, x2, x1):
     return coordinate_vector
 
 # TODO: pass bounding box information about the largest array
-def getTopographyData(width, height, pixels, RGB_heights):
+def getTopographyData(width, height, spacing, pixels, RGB_heights):
     cols = 3
     rows = width*height
     TopographyData = [[0]*cols for _ in range(rows)]
     index = 0
     
-    for x in range (width): 
+    for x in range (0, width): 
         for y in range (height):
             r_im, g_im, b_im = pixels[x,y]
             indexClosest = getClosestIndex(r_im, g_im, b_im, RGB_heights)
