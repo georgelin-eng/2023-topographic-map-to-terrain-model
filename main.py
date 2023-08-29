@@ -4,6 +4,8 @@ import colors_processing
 import plot
 import numpy as np
 import cv2 as cv
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # Import the 3D plotting toolkit
 
 # PARAMETERS
     # DATAFILE - File name of topography image to process
@@ -13,14 +15,14 @@ import cv2 as cv
     # DEPTH_RESOLUTION - sets limit to the number of rows in (r, g, b) to depth matrix (controls the veritical resolution of the output)
 
 
-DATAFILE = 'topo0.png'
-XY_RESOLUTION = 3
-MAX_DEPTH = 500
-MIN_DEPTH = -250
-DEPTH_RESOLUTION = 15
+DATAFILE = 'Spectrogram.png'
+XY_RESOLUTION = 5
+MAX_DEPTH = 2250
+MIN_DEPTH = -5500
+DEPTH_RESOLUTION = 20
 
-Topography_state = 'off'
 Plotting = 'off'
+plot_3D_map_status = 'on'
 
 ##################################################################
 # PREPROCESSING STEP
@@ -53,7 +55,7 @@ ret, thresh = cv.threshold(imgray, 127, 255, 0)
 contours, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE) # Obtain contours 
  
 # Computing locations of rectangular features
-contour_data = img_processing.get_contour_data(contours)
+contour_data, x_of_max, y_of_max, w_of_max, h_of_max = img_processing.get_contour_data(contours)
 
 # Create image with contours around colorbar drawn
 for entry in contour_data:
@@ -69,6 +71,14 @@ im = Image.open(DATAFILE, 'r')
 rgb_im = im.convert('RGB')
 pixel_map = rgb_im.load()
 
+# Cropping image step
+
+im_to_Crop = rgb_im
+crop_dim = (x_of_max+2, y_of_max+4, x_of_max+w_of_max-4, y_of_max+h_of_max-4)
+im_crop = im_to_Crop.crop(crop_dim)
+im_resized = im_crop.resize((int(w_of_max/XY_RESOLUTION), int(h_of_max/XY_RESOLUTION)))
+
+im_resized.save('Cropped_image.png')
 
 ##################################################################
 # IMAGE SAMPLING STEP
@@ -84,30 +94,34 @@ rgb_values = img_processing.getRGB_values(pixel_map, contour_data)
 # Outputs an array in the form [r, g, b, depth]
 RGB_heights = colors_processing.getRGBHeights(rgb_values, MIN_DEPTH, MAX_DEPTH)
 
-if Topography_state == 'on':
-    print("\n Getting topography data... \n")
-    TopographyData = img_processing.getTopographyData(width, height, pixel_map, RGB_heights)
+# Processing topology data
+# RGB_heights = colors_processing.removeDramaticChanges(RGB_heights)
+RGB_heights = colors_processing.removeEntries(RGB_heights, DEPTH_RESOLUTION+1)
+RGB_heights = colors_processing.removeBadColors(RGB_heights)
 
-    np_topography = np.array(TopographyData)
-    np.savetxt('data.csv', np_topography, delimiter=',', fmt='%d')
+print(f"\n {RGB_heights}")
 
-    print(TopographyData)  
+print("\n Getting topography data... \n")
+cropped_pixel_map = im_resized.load()
+cropped_width = int(w_of_max/XY_RESOLUTION)
+cropped_height = int(h_of_max/XY_RESOLUTION)
+TopographyData = img_processing.getTopographyData(cropped_width, cropped_height, cropped_pixel_map, RGB_heights, MIN_DEPTH)
+
+np_topography = np.array(TopographyData)
+np.savetxt('data.csv', np_topography, delimiter=',', fmt='%d')
+
+    # print(TopographyData)  
 ##########################################################################
 
 # Plotting Function Data 
 
 ##########################################################################
 
-# Processing topology data
-# RGB_heights = colors_processing.removeDramaticChanges(RGB_heights)
-RGB_heights = colors_processing.removeEntries(RGB_heights, DEPTH_RESOLUTION+1)
-RGB_heights = colors_processing.removeBadColors(RGB_heights)
+# 3d Plot 
+if plot_3D_map_status == 'on':
+    plot.create_3D_map(TopographyData)
 
 # Creating Colorbar plot
 if Plotting == 'on':
     colorbar_rgb_data = plot.extract_RGB(RGB_heights)
     plot.create_color_bar(colorbar_rgb_data)
-
-
-print(f"\n {RGB_heights}")
-

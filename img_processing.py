@@ -23,6 +23,8 @@ def get_contour_data (contours):
     size = np.zeros (len(contours))
     contour_data = []
 
+    max_area = x_of_max = y_of_max = w_of_max = h_of_max = 0
+
     # create array of sizes
     for c in contours:
         # get area information and information of bounding boxes
@@ -33,6 +35,13 @@ def get_contour_data (contours):
         # determining rectangular contours 
         #   rectangularness is measured based on bounding box vs contour area
         #   bounding_box_area/area ~ 1 means a perfect rectangle. 1.3 is chosen for some wiggle room
+        
+        if area > max_area:
+            max_area = area
+            x_of_max = x
+            y_of_max = y
+            w_of_max = w
+            h_of_max = h
 
         if area > 80:
             if bounding_box_area/area < 1.3:
@@ -61,7 +70,7 @@ def get_contour_data (contours):
     else: # Don't delete entries if the topography is a unique shape 
         pass
 
-    return contour_data
+    return contour_data, x_of_max, y_of_max, w_of_max, h_of_max
 
 def getRGB_values (pixel_map, contour_data):
 
@@ -177,10 +186,10 @@ def create_coordinate_array (contour_data, x2, x1):
     return coordinate_vector
 
 # TODO: pass bounding box information about the largest array
-def getTopographyData(width, height, pixels, RGB_heights):
+def getTopographyData(width, height, pixels, RGB_heights, depth):
     cols = 3
     rows = width*height
-    TopographyData = [[0]*cols for _ in range(rows)]
+    TopographyData = [[depth]*cols for _ in range(rows)]
     index = 0
     
     for x in range (width): 
@@ -188,10 +197,11 @@ def getTopographyData(width, height, pixels, RGB_heights):
             r_im, g_im, b_im = pixels[x,y]
             indexClosest = getClosestIndex(r_im, g_im, b_im, RGB_heights)
 
+            TopographyData[index][0] = x                
+            TopographyData[index][1] = y                
+            
             if indexClosest is not None:
-                TopographyData[index][0] = x                
-                TopographyData[index][1] = y                
-                TopographyData[index][1] = RGB_heights[indexClosest][3]           
+                TopographyData[index][2] = RGB_heights[indexClosest][3]           
 
             index +=1
 
