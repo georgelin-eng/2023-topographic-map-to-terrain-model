@@ -97,7 +97,7 @@ The type of direction of the sampling is used determined based on these conditio
 | x changes |   ignore    |  sample left  |
 | y changes |   ignore    |  sample down  |
 
-Next, to assign heights to each RGB value, the difference between one RGB to the next is added to a growing sum. Once this sum reaches a threshold value, it is reset. The index of this change occurs is tracked which will be used to determine the height of that RGB value. This is done through using `numpy.linspace()` from the min to max height values over the total number of RGB values. The index where a color changes neatly corresponds to that same index in the `numpy.linespace()` NumPy array. 
+Next, to assign heights to each RGB value, the difference between one RGB to the next is added to a growing sum. Once this sum reaches a threshold value, it is reset. The index of this change occurs is tracked which will be used to determine the height of that RGB value. This is done through using `numpy.linspace()` from the min to max height values over the total number of RGB values. The index where a color changes, for that same index in the `numpy.linespace()` NumPy array, conveniently is the height value of that color.   
 
 This process allows for the automatic generation of a 2d matrix that relates RGB values to heights.
 
