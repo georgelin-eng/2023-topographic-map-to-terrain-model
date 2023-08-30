@@ -22,14 +22,14 @@ The program works automatically, with the user only needing to specify the file 
 ![[topographic-map-to-3D-terrain-model.png]]
 ## Technical Details
 
-#### High level overview of steps
+### High level overview of steps
 1. Preprocessing
 2. Contour detection
 3. Assigning heights to RGB values
 4. Creating topographic data
 5. Creating the 3d model
 
-#### 1. Preprocessing:
+### 1. Preprocessing:
 This is done through iterating through each pixel in order to create what is known as a binary image. Based on general requirements outlined previously, the simplest way to do this would be to convert all gray/white to black, while any colored pixel becomes white. 
 
 Grays are sometimes used as a background in topographic image. Therefore, traditional thresholding methods which are based on intensity would not yield the results needed as region in the color bar may be removed unintentionally or the gray region may become white if the thresholding value is set low low.
@@ -54,7 +54,7 @@ Below is the original image and the binary output after the preprocessing step:
 
 
 
-#### 2. Contour detection
+### 2. Contour detection
 Contour detection was done using OpenCV which is a library used for computer vision tasks. Using contour detection directly without first preprocessing makes the program less robust however this is at the cost of computation time. I believe this tradeoff for preprocessing is worth it however since it gets rid of many rectangular like regions while excluding the color bar(which will be important later). 
 
 After the preprocessing step, all contours will exhibit characteristics that let them be easily grouped into categories
@@ -75,7 +75,7 @@ Finally, noise can be easily by only considering regions with area above a certa
 **Program selected contours drawn shown below**
 ![[Contour detection.png | 600]]
 
-#### 3. Assigning heights to RGB values
+### 3. Assigning heights to RGB values
 
 The relevant characteristics of each rectangle in the color bar is saved to a dictionary, these being:
 - x, y - location of the upper left corner
@@ -101,13 +101,13 @@ This process allows for the automatic generation of a 2d matrix that relates RGB
 
 Later, this array is filtered for distinct colors, then if needed, reduced further so that there is a single RGB value for the specified number of distinct heights the user requests. 
 
-#### 4. Creating topographic data
+### 4. Creating topographic data
 
 
 
 
 
-#### 5. Creating the 3d model
+### 5. Creating the 3d model
 
 
 
