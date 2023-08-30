@@ -57,21 +57,30 @@ Below is the original image and the binary output after the preprocessing step:
 <img src="https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Binary%20image.png" width="650">
 
 ### 2. Contour detection
-Contour detection was done using OpenCV which is a library used for computer vision tasks. Using contour detection directly without first preprocessing makes the program less robust however this is at the cost of computation time. I believe this tradeoff for preprocessing is worth it however since it gets rid of many rectangular like regions while excluding the color bar(which will be important later). 
+Contour detection was done using OpenCV which is a library used for computer vision tasks. Specifically, `cv2.findContours()` is used, and returns two values, contours and hierarchy. Hierarchy can be ignored, while contours is a list of all the contours in the image, stored as an NumPy array of (x, y) coordinates of the contour boundary
 
-After the preprocessing step, all contours will exhibit characteristics that let them be easily grouped into categories
+Two other functions are used:
+1. `cv.contourArea()` - returns the area bounding by the contour
+2. `cv.boundingRect()` - creates a straight rectangle around a contour. It returns (x, y) coordinates of the top left corner and a width and height
+
+The program iterates through each contour, storing the information of each contour within a dictionary in a list. 
+
+
+After going through all contours, the contours need to be grouped into 3 categories:
 1. Region corresponding to the topography
 2. Regions corresponding to the color bar
 3. Noise
 
+
 The first is easy to address. Select the largest contour. This works for all square/rectangular topographies which is most cases. For the above case where a unique island shape is used, this works as well. 
-Improvements can be made to account for multiple uniquely shaped islands, which will be done by having a criteria which will allow for multiple large regions to be selected. Large in this case being over 10x the area of the color bar.
 
 Color bar detection works by measuring how rectangular each contour is. Given that the area of a bounding box will always be larger than the area of the contour is encompasses, this gives a simple but robust way to detect for rectangular regions. 
 
-For a perfect rectangle, `area_bounding_box / area_Contour == 1`. 1.3 is chosen as the threshold for when a feature is considered rectangular to allow for some variation in how contours are selected by OpenCV. 
+For a perfect rectangle, the `area_bounding_box / area_Contour == 1`. 1.3 is chosen as the threshold for when a feature is considered rectangular to allow for some variation in how contours are selected by OpenCV. 
 
 Finally, noise can be easily by only considering regions with area above a certain level e.g. 80 pixels. 
+
+A subset of the original list is then created which stores only the rectangles of the color bar. 
 
 
 **Program selected contours drawn shown below**
@@ -101,17 +110,32 @@ This process allows for the automatic generation of a 2d matrix that relates RGB
 
 ![](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Pasted%20image%2020230829184806.png)
 
-Later, this array is filtered for distinct colors, then if needed, reduced further so that there is a single RGB value for the specified number of distinct heights the user requests. 
+Later, this array is filtered for distinct colors, then if needed, reduced further so that there is a as many RGB values as the specified number of distinct heights the user requests. 
 
 ### 4. Creating topographic data
+
+Based on the results of step 2, the x, y, w, h parameters of the largest contour are used to crop the input image. 
+
+This creates a smaller cropped version of the image to work from for increased efficiency. At this stage, the cropped image is also then scaled down.
+
+The output array is initialized with the minimum depth values, and a the RGB value of each pixel is used to find the closest match in a `heights_of_RGB` list. The corresponding height of the closest matching color is used as the height of the pixel. 
+
+The output of this process is an array with 3 columns, `(x, y, height)` which is a couple thousand pixels long.
 
 
 
 
 
 ### 5. Creating the 3d model
+The final 3d model was created using the  `plot_surface()` in Matplotlib and simply requires the data from the matrix created in step 4 to be passed as parameters, x, y, z lists. 
 
+## Conclusions and Future Work
 
+For step 4, every time the comparison is done it's necessary to iterate through the entirety of the `heights_of_RGB`. For large images and if a high depth resolution is wanted, this dramatically increases computation time. 
+
+An alternative search algorithm for the closest RGB value should be employed so that this process can be sped up. However, the program takes generally takes 1-2 seconds to run, and up to 10 seconds for 4k images, so accounting for the extra time it takes to import the extra modules necessary for better search algorithms, the time improvements may be marginal. 
+
+Another thing that I would like to improve is overall how robust the system for more reliable color bar detection. Implementing OCR on the color bar would also be an improvement I'm looking to make so that the user doesn't need to specific min and max depths and these would instead be obtained automatically. 
 
 
 ## Conclusions and Future Work
