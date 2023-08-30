@@ -136,6 +136,3 @@ For step 4, every time the comparison is done it's necessary to iterate through 
 An alternative search algorithm for the closest RGB value should be employed so that this process can be sped up. However, the program takes generally takes 1-2 seconds to run, and up to 10 seconds for 4k images, so accounting for the extra time it takes to import the extra modules necessary for better search algorithms, the time improvements may be marginal. 
 
 Another thing that I would like to improve is overall how robust the system for more reliable color bar detection. Implementing OCR on the color bar would also be an improvement I'm looking to make so that the user doesn't need to specific min and max depths and these would instead be obtained automatically. 
-
-
-## Conclusions and Future Work
