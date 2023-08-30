@@ -19,7 +19,7 @@ The program works automatically, with the user only needing to specify the file 
 
 10x downscaling and 15 discrete heights yields this following output when taking the image to the right as the input (output on left).
 
-![[topographic-map-to-3D-terrain-model.png]]
+![](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/topographic-map-to-3D-terrain-model.png)
 
 
 
