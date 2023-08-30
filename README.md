@@ -5,7 +5,7 @@
 
 This is a program which converts any 2d raster image scaled by color and converts it to a 3d terrain model. 
 
-It is intended for use specifically with topographic images as an extension of my [sonar depth mapping project](https://github.com/georgelin-eng/Sonar-Depth-Mapping-System/tree/main), but will work in general given these general requirements
+It is intended for use specifically with topographic images as an extension of my [sonar depth mapping project](https://github.com/georgelin-eng/Sonar-Depth-Mapping-System/tree/main), but will work in given these general requirements
 
 1. A colored region where each pixel has some height which corresponds to a color
 2. A color bar (either discrete segments or whole) separate from the image
@@ -20,6 +20,10 @@ The program works automatically, with the user only needing to specify the file 
 10x downscaling and 15 discrete heights yields this following output when taking the image to the right as the input (output on left).
 
 ![[topographic-map-to-3D-terrain-model.png]]
+
+
+
+
 ## Technical Details
 
 ### High level overview of steps
