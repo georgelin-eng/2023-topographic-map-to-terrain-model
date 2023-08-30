@@ -51,11 +51,9 @@ Grayness in this case can be measured as: `max(r, g, b) - min(r, g, b)`
 
 Larger differences would be seen in something like pure red (255, 0, 0) while a perfect gray like (128, 128, 128) would have a difference of 0. A small but above zero value is chosen as the threshold for grayness. 
 
-
 Below is the original image and the binary output after the preprocessing step: 
-![[Topo1.png|600]]
-![[Binary image.png | 650]]
-
+![Image](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Topo1.png | width = 650)
+![Image](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Binary%20image.png | width = 650)
 
 
 ### 2. Contour detection
@@ -77,7 +75,7 @@ Finally, noise can be easily by only considering regions with area above a certa
 
 
 **Program selected contours drawn shown below**
-![[Contour detection.png | 600]]
+![](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Contour%20detection.png | width = 600)
 
 ### 3. Assigning heights to RGB values
 
@@ -101,7 +99,7 @@ Next, to assign heights to each RGB value, the difference between one RGB to the
 
 This process allows for the automatic generation of a 2d matrix that relates RGB values to heights.
 
-![[Pasted image 20230829184806.png]]
+![](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Pasted%20image%2020230829184806.png)
 
 Later, this array is filtered for distinct colors, then if needed, reduced further so that there is a single RGB value for the specified number of distinct heights the user requests. 
 
