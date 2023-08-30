@@ -67,7 +67,7 @@ Improvements can be made to account for multiple uniquely shaped islands, which 
 
 Color bar detection works by measuring how rectangular each contour is. Given that the area of a bounding box will always be larger than the area of the contour is encompasses, this gives a simple but robust way to detect for rectangular regions. 
 
-For a perfect rectangle, the `area_bounding_box / area_Contour == 1`. 1.3 is chosen as the threshold for when a feature is considered rectangular to allow for some variation in how contours are selected by OpenCV. 
+For a perfect rectangle, `area_bounding_box / area_Contour == 1`. 1.3 is chosen as the threshold for when a feature is considered rectangular to allow for some variation in how contours are selected by OpenCV. 
 
 Finally, noise can be easily by only considering regions with area above a certain level e.g. 80 pixels. 
 
