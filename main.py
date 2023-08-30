@@ -15,20 +15,20 @@ from mpl_toolkits.mplot3d import Axes3D  # Import the 3D plotting toolkit
     # DEPTH_RESOLUTION - sets limit to the number of rows in (r, g, b) to depth matrix (controls the veritical resolution of the output)
 
 
-DATAFILE = 'Spectrogram.png'
-XY_RESOLUTION = 5
+DATAFILE = 'Topo4.png'
+XY_RESOLUTION = 10
 MAX_DEPTH = 2250
 MIN_DEPTH = -5500
-DEPTH_RESOLUTION = 20
-
-Plotting = 'off'
-plot_3D_map_status = 'on'
+DEPTH_RESOLUTION = 15
 
 ##################################################################
 # PREPROCESSING STEP
 # The specific file is loaded as a pixel map and each individual becomes either black or white based on a specified condition
-# This process is iterated for each pixel for O(n^2) performance
+# This process is iterated for each pixel for O(n) performance where n is the number of pixels
 # TODO: Use matrix manipulations to achieve better runtime efficiency
+
+plot_colorbar = 'off'
+plot_3D_map_status = 'off'
 
 im = Image.open(DATAFILE, 'r')
 width, height = im.size
@@ -60,7 +60,7 @@ contour_data, x_of_max, y_of_max, w_of_max, h_of_max = img_processing.get_contou
 # Create image with contours around colorbar drawn
 for entry in contour_data:
     cnt = contours[entry['index']]
-    im = cv.drawContours(im, [cnt], -1, (0,0,255), 1)
+    im = cv.drawContours(im, [cnt], -1, (0,0,255), 2)
 
     print (f"x = {entry['x']}, y = {entry['y']}, w = {entry['w']}, h = {entry['h']}")
 
@@ -101,16 +101,11 @@ RGB_heights = colors_processing.removeBadColors(RGB_heights)
 
 print(f"\n {RGB_heights}")
 
-print("\n Getting topography data... \n")
 cropped_pixel_map = im_resized.load()
 cropped_width = int(w_of_max/XY_RESOLUTION)
 cropped_height = int(h_of_max/XY_RESOLUTION)
 TopographyData = img_processing.getTopographyData(cropped_width, cropped_height, cropped_pixel_map, RGB_heights, MIN_DEPTH)
 
-np_topography = np.array(TopographyData)
-np.savetxt('data.csv', np_topography, delimiter=',', fmt='%d')
-
-    # print(TopographyData)  
 ##########################################################################
 
 # Plotting Function Data 
@@ -122,6 +117,10 @@ if plot_3D_map_status == 'on':
     plot.create_3D_map(TopographyData)
 
 # Creating Colorbar plot
-if Plotting == 'on':
+if plot_colorbar == 'on':
     colorbar_rgb_data = plot.extract_RGB(RGB_heights)
     plot.create_color_bar(colorbar_rgb_data)
+
+
+print("\n\n\n")
+print (np.linspace(MIN_DEPTH, MAX_DEPTH, 12).astype(int))
