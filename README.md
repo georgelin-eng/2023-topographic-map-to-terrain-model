@@ -19,6 +19,7 @@ The program works automatically, with the user only needing to specify the file 
 
 10x downscaling and 15 discrete heights yields this following output when taking the image to the right as the input (output on left).
 
+
 ![](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/topographic-map-to-3D-terrain-model.png)
 
 
@@ -52,9 +53,8 @@ Grayness in this case can be measured as: `max(r, g, b) - min(r, g, b)`
 Larger differences would be seen in something like pure red (255, 0, 0) while a perfect gray like (128, 128, 128) would have a difference of 0. A small but above zero value is chosen as the threshold for grayness. 
 
 Below is the original image and the binary output after the preprocessing step: 
-![Image](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Topo1.png | width = 650)
-![Image](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Binary%20image.png | width = 650)
-
+<img src="https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Topo1.png" width="650">
+<img src="https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Binary%20image.png" width="650">
 
 ### 2. Contour detection
 Contour detection was done using OpenCV which is a library used for computer vision tasks. Using contour detection directly without first preprocessing makes the program less robust however this is at the cost of computation time. I believe this tradeoff for preprocessing is worth it however since it gets rid of many rectangular like regions while excluding the color bar(which will be important later). 
@@ -75,7 +75,7 @@ Finally, noise can be easily by only considering regions with area above a certa
 
 
 **Program selected contours drawn shown below**
-![](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Contour%20detection.png | width = 600)
+![](https://github.com/georgelin-eng/topographic-map-to-3D-terrain-model/blob/main/images/Contour%20detection.png)
 
 ### 3. Assigning heights to RGB values
 
